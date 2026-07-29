@@ -14,7 +14,9 @@ spring:
     default: mock
 
   datasource:
-    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:repomind}
+    # sslmode=disable no default local (Postgres do docker-compose nao fala TLS).
+    # Producao (Neon) seta POSTGRES_SSL_MODE=require.
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:repomind}?sslmode=${POSTGRES_SSL_MODE:disable}
     username: ${POSTGRES_USER:repomind}
     password: ${POSTGRES_PASSWORD}
     hikari:
@@ -39,7 +41,10 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
       timeout: 2s
+      ssl:
+        enabled: ${REDIS_SSL:false}
 
   security:
     oauth2:
