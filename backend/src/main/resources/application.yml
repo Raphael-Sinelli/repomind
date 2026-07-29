@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: repomind
+
+  # Le o .env da raiz do monorepo como property source. `optional:` faz o app subir
+  # normalmente em CI/container, onde as variaveis vem do ambiente e o arquivo nao
+  # existe. Variavel de ambiente real sempre tem precedencia sobre o arquivo.
+  config:
+    import: "optional:file:../.env[.properties]"
+
+  profiles:
+    # `mock` roda a analise sem chamar a API da Anthropic. Sobrescreva com
+    # SPRING_PROFILES_ACTIVE=anthropic quando houver ANTHROPIC_API_KEY.
+    default: mock
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:repomind}
+    username: ${POSTGRES_USER:repomind}
+    password: ${POSTGRES_PASSWORD}
+    hikari:
+      # Servidor em UTC de ponta a ponta.
+      connection-init-sql: SET TIME ZONE 'UTC'
+
+  jpa:
+    # O schema pertence ao Flyway. Hibernate nunca altera DDL.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2s
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            # `repo` da acesso a repositorios privados. Se quiser limitar a publicos,
+            # troque por `public_repo`.
+            scope:
+              - read:user
+              - user:email
+              - repo
+
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        same-site: lax
+        # Vira true em producao (HTTPS). Em dev via http://localhost precisa ser false.
+        secure: ${SESSION_COOKIE_SECURE:false}
+
+repomind:
+  frontend-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+  github:
+    base-url: ${GITHUB_API_BASE_URL:https://api.github.com}
+  anthropic:
+    model: ${ANTHROPIC_MODEL:claude-opus-5}
+    # Teto de iteracoes do loop de tool use. Estourar e erro explicito, nunca silencio.
+    max-tool-iterations: 8
+  cache:
+    analysis-ttl: 24h
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.rsinelli.repomind: DEBUG

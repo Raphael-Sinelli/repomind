@@ -1,0 +1,37 @@
+# --- segredos ---
+.env
+.env.local
+*.pem
+*.key
+
+# --- java / maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# --- node ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+coverage/
+
+# --- terraform ---
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# --- editores ---
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+# --- logs ---
+*.log
+npm-debug.log*
