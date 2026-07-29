@@ -6,15 +6,23 @@ prompt unico, e um loop de agente com decisao do modelo em cada rodada.
 
 Projeto de portfolio. Java 21 + Spring Boot no backend, React 19 no frontend.
 
+**Em producao**: [repomind-flame.vercel.app](https://repomind-flame.vercel.app)
+(frontend) + [repomind-backend-39ws.onrender.com](https://repomind-backend-39ws.onrender.com)
+(backend). Login OAuth real, fluxo completo funcionando.
+
+> O backend roda no tier gratuito do Render, que hiberna sem trafego. A
+> **primeira requisicao depois de um periodo ocioso leva ~30-50s** (cold start)
+> enquanto o container sobe — normal, nao e bug. Requisicoes seguintes sao rapidas.
+
 ## Arquitetura
 
 ```mermaid
 flowchart LR
   subgraph Browser
-    FE[React 19 + TS<br/>Vite :5173]
+    FE[React 19 + TS<br/>Vite em dev, Vercel em producao]
   end
 
-  subgraph Backend["Spring Boot :8080"]
+  subgraph Backend["Spring Boot<br/>local em dev, Render em producao"]
     Sec[Spring Security<br/>OAuth2 Client]
     API[REST Controllers]
     Svc[AnalysisService]
@@ -22,8 +30,8 @@ flowchart LR
   end
 
   GH[(GitHub REST API)]
-  PG[(PostgreSQL 16)]
-  Redis[(Redis 7)]
+  PG[(PostgreSQL 16<br/>docker-compose em dev, Neon em producao)]
+  Redis[(Redis 7<br/>docker-compose em dev, Upstash em producao)]
   Anthropic[(api.anthropic.com)]
 
   FE -->|cookie de sessao| Sec
@@ -128,11 +136,28 @@ Trocar para a integracao real e uma variavel de ambiente
 ate isso acontecer, a afirmacao honesta e "o loop esta correto conforme a
 especificacao da API e testado no nivel de protocolo", nao "funciona em producao".
 
-## Infraestrutura AWS
+## Deploy
+
+A producao atual roda numa stack gratuita, escolhida por custo — nao e a
+arquitetura "de producao real" deste projeto (essa e a AWS, ver secao abaixo):
+
+| Componente | Onde | Nota |
+|---|---|---|
+| Frontend | Vercel | `vercel.json` reescreve `/api/*`, `/oauth2/*` e o callback do GitHub para o backend no Render — o Vercel nao tem o proxy do Vite, entao sem isso login e chamadas de API cairiam 404 no proprio Vercel |
+| Backend | Render (Docker, tier gratuito) | `backend/Dockerfile` multi-stage; le `PORT` injetada pelo Render em runtime, sem alterar `application.yml` |
+| Postgres | Neon | TLS obrigatorio — `POSTGRES_SSL_MODE=require` |
+| Redis | Upstash | TLS + senha obrigatorios — `REDIS_SSL=true`, `REDIS_PASSWORD` |
+
+Todas as variaveis novas de TLS/senha (`POSTGRES_SSL_MODE`, `REDIS_PASSWORD`,
+`REDIS_SSL`) tem default seguro para o dev local (`disable`, vazio, `false`) —
+o `docker-compose.yml` local nunca fala TLS e continua funcionando sem mudanca.
+
+## Infraestrutura AWS (design, nao aplicado)
 
 `infra/` contem Terraform completo (VPC, RDS, ElastiCache, ECR, ECS Fargate, ALB,
-Secrets Manager) — versionado como design, **nunca aplicado**. Detalhes e diagrama
-em [`infra/README.md`](infra/README.md).
+Secrets Manager) — versionado como design de producao real, **nunca aplicado**
+contra uma conta AWS (a demo publica acima usa Vercel/Render/Neon/Upstash por
+serem gratuitos). Detalhes e diagrama em [`infra/README.md`](infra/README.md).
 
 ## Aprendizados
 
