@@ -11,6 +11,10 @@
     {
       "source": "/login/oauth2/code/github",
       "destination": "https://repomind-backend-39ws.onrender.com/login/oauth2/code/github"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
