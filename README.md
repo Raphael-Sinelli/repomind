@@ -12,16 +12,16 @@ Projeto de portfolio. Java 21 + Spring Boot no backend, React 19 no frontend.
 **[repomind-flame.vercel.app](https://repomind-flame.vercel.app)** — deploy real,
 login OAuth real, fluxo completo funcionando.
 
+> **Primeira requisicao pode levar ~30-50s.** O backend roda no tier gratuito do
+> Render, que hiberna sem trafego — e normal, nao e bug. Depois do primeiro
+> load, tudo fica rapido.
+
 O login usa OAuth de verdade contra a API do GitHub — **nao existe usuario de
 demonstracao**. Cada pessoa que autoriza o app ve os proprios repositorios dela,
 nao os do autor do projeto. Isso e o comportamento esperado, nao um bug: e a
 prova de que a integracao OAuth e o `GitHubClient` sao reais, nao mockados. Pra
 testar de verdade e preciso autorizar com a propria conta GitHub (permissoes
 `read:user`, `user:email`, `repo` — leitura, nunca escrita).
-
-> O backend roda no tier gratuito do Render, que hiberna sem trafego. A
-> **primeira requisicao depois de um periodo ocioso leva ~30-50s** (cold start)
-> enquanto o container sobe. Requisicoes seguintes sao rapidas.
 
 ## Stack
 
