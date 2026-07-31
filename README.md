@@ -7,6 +7,9 @@ quer mais dados ou se já pode responder.
 
 Projeto de portfólio. Java 21 + Spring Boot no backend, React 19 no frontend.
 
+![Lista de repositórios](docs/screenshots/repositories-list.png)
+*Lista de repositórios após autenticação via GitHub OAuth*
+
 ## Demo
 
 **[repomind-flame.vercel.app](https://repomind-flame.vercel.app)** — deploy real,
