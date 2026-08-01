@@ -7,8 +7,11 @@ quer mais dados ou se já pode responder.
 
 Projeto de portfólio. Java 21 + Spring Boot no backend, React 19 no frontend.
 
+![Tela de login](docs/screenshots/login-screen.png)
+*Login via OAuth2 real do GitHub — sem conta demo*
+
 ![Lista de repositórios](docs/screenshots/repositories-list.png)
-*Lista de repositórios após autenticação via GitHub OAuth*
+*Lista de repositórios após autenticação*
 
 ## Demo
 
